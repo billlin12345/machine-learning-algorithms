@@ -1,0 +1,73 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+std::string getLinearEquationFromParameters(std::vector<double> theta){
+    std::string equation = "y = " + std::to_string(theta[0]) + " ";
+    for (auto i = 1; i != theta.size(); ++i){
+        equation += "+ " + std::to_string(theta[i]) + "x"; // adds + and the new parameter
+    }
+    return equation;
+}
+
+template<class T>
+double dotProduct(const std::vector<T> A, const std::vector<T> B){
+    double sum = 0;
+    if (A.size() != B.size()) {std::cout << "Different vector sizes. \n"; return -1;}
+    else {
+        for (auto i = 0; i != A.size(); ++i){
+            sum += A[i] * B[i];
+        }
+    }
+    return sum;
+}
+
+// para = para - alpha * (1/m)(summation i=1 to m: [h(x_i)-y(x_i)]x_i)
+std::vector<double> updateParameter(double alpha, std::vector<double> parameter,
+                      const std::vector<double> &xVal, const std::vector<double> &yVal){
+    // because linear regression is a+bx, the x's would be (0,xValue) for the dot product
+    if (xVal.size() != yVal.size()) {
+        std::cout << "Error: X and Y have different vector sizes. \n";
+        std::exit(-1);
+    }
+    std::vector<double> x = {1,1}; // basis function
+    int m = xVal.size();
+
+    // iterates 3500 times until convergence
+    for (auto k = 0; k != 3500; ++k){
+        double summation = 0, summation2 = 0;
+        // calculates summation for all the x,y values
+        for (auto i = 0; i != m; ++i){
+            x[1] = xVal[i];
+            // dot product of parameter and xVal to get estimated y
+            summation += ( (dotProduct(x, parameter) - yVal[i]) ); // 1st para
+            summation2 += ( (dotProduct(x, parameter) - yVal[i]) * xVal[i]); // 2nd para
+        }
+        parameter[0] -= alpha * summation / m;
+        parameter[1] -= alpha * summation2 / m;
+        for (auto i:parameter)
+            std::cout << "\nParameters: " << i;
+        std::cout << std::endl;
+    }
+    return parameter;
+}
+
+int main(){
+    double alpha = 0.006; // step size try 0.006
+
+    std::vector<double> xVal = {5,1,2,30,9,4};
+    std::vector<double> yVal = {0,10,20,40,5,9};
+    std::vector<double> thetaOld {1,1};  // parameters/coefficients: initial guess
+    std::vector<double> thetaNew = thetaOld;
+
+    thetaNew = updateParameter(alpha, thetaNew, xVal, yVal);
+
+    std::string linearEquation = getLinearEquationFromParameters(thetaNew);
+    std::cout << "\nInitial guess: \n";
+    for (auto i:thetaOld){std::cout << i << " ";}
+    std::cout << std::endl;
+    std::cout << "\nThis is the new parameter list: \n";
+    for (auto i:thetaNew) std::cout << i << " \n";
+    std::cout << "\nThis is the linear equation: \n" << linearEquation <<std::endl;
+    return 0;
+}
