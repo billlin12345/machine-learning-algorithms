@@ -65,7 +65,6 @@ int main(){
     std::string linearEquation = getLinearEquationFromParameters(thetaNew);
     std::cout << "\nInitial guess: \n";
     for (auto i:thetaOld){std::cout << i << " ";}
-    std::cout << std::endl;
     std::cout << "\nThis is the new parameter list: \n";
     for (auto i:thetaNew) std::cout << i << " \n";
     std::cout << "\nThis is the linear equation: \n" << linearEquation <<std::endl;
